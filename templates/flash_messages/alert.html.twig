@@ -1,0 +1,24 @@
+{% for label, messages in app.flashes (['error']) %}
+    {% for message in messages %}
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert-message">
+                <div class="flash-{{ label }} ">
+                    {{ message }}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endfor %}
+{% for label, messages in app.flashes (['success']) %}
+    {% for message in messages %}
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert-message">
+                <div class="flash-{{ label }} ">
+                    {{ message }}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endfor %}

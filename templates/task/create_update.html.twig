@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer une tache{% endblock %}
+
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{% block body %}
+<div class="col-lg-7 col-md-10 mx-auto">
+    <div class="row">
+        {% if app.request.attributes.get('_route')=='task_create' %}
+            {{ form_start(form,{'action' : path('task_create')}) }}
+        {% elseif app.request.attributes.get('_route')=='task_edit' %}
+            {{ form_start(form,{'action' : path('task_edit',{'id': task.id})} ) }}
+        {% endif %}
+        {{ form_widget(form) }}
+
+        {% if app.request.attributes.get('_route')=='task_create' %}
+            <button type="submit" class="btn btn-success pull-right">Ajouter</button>
+        {% elseif app.request.attributes.get('_route')=='task_edit' %}
+            <button type="submit" class="btn btn-success pull-right">Editer</button>
+        {% endif %}
+
+        {{ form_end(form) }}
+
+        <a href="{{ path('task_list') }}" class="btn btn-primary">Retour à la liste des tâches</a>
+    </div>
+</div>
+{% endblock %}

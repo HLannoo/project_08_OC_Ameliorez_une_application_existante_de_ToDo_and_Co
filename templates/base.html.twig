@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+        <link rel="stylesheet" href="https://bootswatch.com/5/lux/bootstrap.min.css">
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <header>
+        {% block header %}
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm ">
+                <div class="container"><a href="" class="navbar-brand"> <b>ToDo&Co</b></a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div id="navbarSupportedContent" class="collapse navbar-collapse flex-row-reverse">
+
+                        <ul class="navbar-nav">
+                             {#  if app.user and app.user.isVerified == true #}
+                                <li class="nav-item"><a href="{{ path('task_list') }}" class="nav-link">Ma ToDo</a></li>
+                                <li class="nav-item"><a href="" class="nav-link">Gestion utilisateurs</a></li>
+                                <li class="nav-item btn-dark rounded"><a href="" class="nav-link">Déconnexion</a></li>
+                            {# else #}
+                                <li class="nav-item"><a href="" class="nav-link">Connexion</a></li>
+                                <li class="nav-item"><a href="" class="nav-link">Inscription</a></li>
+                            {# endif #}
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        {% endblock %}
+    </header>
+    <body>
+    {% block alert %}
+        {{include ('flash_messages/alert.html.twig') }}
+    {% endblock %}
+        {% block body %}
+        {% endblock %}
+    {% block javascript %}
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+    {% endblock %}
+    </body>
+</html>
