@@ -35,8 +35,8 @@ class TaskController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $task->setCreatedAt(new \DateTimeImmutable())
-                ->setIsDone(false);
-            // $task->setCurrentUser($this->getUser());
+                ->setIsDone(false)
+                ->setCurrentUser($this->getUser());
             $this->em->persist($task);
             $this->em->flush();
 
