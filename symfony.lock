@@ -78,6 +78,18 @@
             "./src/Kernel.php"
         ]
     },
+    "symfony/mailer": {
+        "version": "6.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "4.3",
+            "ref": "97a61eabb351d7f6cb7702039bcfe07fe9d7e03c"
+        },
+        "files": [
+            "./config/packages/mailer.yaml"
+        ]
+    },
     "symfony/maker-bundle": {
         "version": "1.43",
         "recipe": {
@@ -137,6 +149,19 @@
             "./config/packages/validator.yaml"
         ]
     },
+    "symfony/web-profiler-bundle": {
+        "version": "6.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "5.3",
+            "ref": "24bbc3d84ef2f427f82104f766014e799eefcc3e"
+        },
+        "files": [
+            "./config/packages/web_profiler.yaml",
+            "./config/routes/web_profiler.yaml"
+        ]
+    },
     "symfony/webpack-encore-bundle": {
         "version": "1.14",
         "recipe": {
@@ -155,6 +180,9 @@
             "./package.json",
             "./webpack.config.js"
         ]
+    },
+    "symfonycasts/verify-email-bundle": {
+        "version": "v1.10.0"
     },
     "twig/extra-bundle": {
         "version": "v3.4.0"

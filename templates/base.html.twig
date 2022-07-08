@@ -18,19 +18,29 @@
                     <div id="navbarSupportedContent" class="collapse navbar-collapse flex-row-reverse">
 
                         <ul class="navbar-nav">
-                             {#  if app.user and app.user.isVerified == true #}
+                             {%  if app.user and app.user.isVerified == true %}
                                 <li class="nav-item"><a href="{{ path('task_list') }}" class="nav-link">Ma ToDo</a></li>
                                 <li class="nav-item"><a href="" class="nav-link">Gestion utilisateurs</a></li>
-                                <li class="nav-item btn-dark rounded"><a href="" class="nav-link">Déconnexion</a></li>
-                            {# else #}
-                                <li class="nav-item"><a href="" class="nav-link">Connexion</a></li>
-                                <li class="nav-item"><a href="" class="nav-link">Inscription</a></li>
-                            {# endif #}
+                                <li class="nav-item btn-dark rounded"><a href="{{ path('security_logout') }}" class="nav-link">Déconnexion</a></li>
+                            {%  elseif app.user and app.user.isVerified == false %}
+                                <li class="nav-item"><a href="{{ path('security_login') }}" class="nav-link">Connexion</a></li>
+                            {%  else %}
+                                <li class="nav-item"><a href="{{ path('security_login') }}" class="nav-link">Connexion</a></li>
+                                <li class="nav-item"><a href="{{ path('security_register') }}" class="nav-link">Inscription</a></li>
+                            {% endif %}
                         </ul>
                     </div>
                 </div>
             </nav>
         {% endblock %}
+        {% if app.user and app.user.isVerified == false %}
+            <div class="alert alert-warning alert-dismissible" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="alert-message">
+                    <strong>Votre compte n'est pas activé, vérifiez votre boite e-mail</strong>
+                </div>
+            </div>
+        {% endif %}
     </header>
     <body>
     {% block alert %}
