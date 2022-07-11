@@ -16,12 +16,15 @@
                     </button>
 
                     <div id="navbarSupportedContent" class="collapse navbar-collapse flex-row-reverse">
-
                         <ul class="navbar-nav">
-                             {%  if app.user and app.user.isVerified == true %}
+                             {%  if app.user and app.user.isVerified == true and is_granted('ROLE_ADMIN') %}
                                 <li class="nav-item"><a href="{{ path('task_list') }}" class="nav-link">Ma ToDo</a></li>
-                                <li class="nav-item"><a href="" class="nav-link">Gestion utilisateurs</a></li>
+                                <li class="nav-item"><a href="{{ path('user_list') }}" class="nav-link">Liste d'utilisateurs</a></li>
+                                <li class="nav-item"><a href="{{ path('user_create') }}" class="nav-link">Créer un utilisateur</a></li>
                                 <li class="nav-item btn-dark rounded"><a href="{{ path('security_logout') }}" class="nav-link">Déconnexion</a></li>
+                             {%  elseif app.user and app.user.isVerified == true and is_granted('ROLE_USER')%}
+                                 <li class="nav-item"><a href="{{ path('task_list') }}" class="nav-link">Ma ToDo</a></li>
+                                 <li class="nav-item btn-dark rounded"><a href="{{ path('security_logout') }}" class="nav-link">Déconnexion</a></li>
                             {%  elseif app.user and app.user.isVerified == false %}
                                 <li class="nav-item"><a href="{{ path('security_login') }}" class="nav-link">Connexion</a></li>
                             {%  else %}

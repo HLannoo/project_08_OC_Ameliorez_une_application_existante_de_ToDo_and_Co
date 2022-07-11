@@ -39,7 +39,7 @@ class RegistrationController extends AbstractController
             $user->setPassword(
             $userPasswordHasher->hashPassword(
                     $user,
-                    $form->get('plainPassword')->getData()
+                    $form->get('password')->getData()
                 )
             );
 
@@ -51,7 +51,7 @@ class RegistrationController extends AbstractController
                 (new TemplatedEmail())
                     ->from(new Address('h.lannoo@orange.fr', 'ToDo&Co'))
                     ->to($user->getEmail())
-                    ->subject('Please Confirm your Email')
+                    ->subject('Merci de confirmer votre email')
                     ->htmlTemplate('registration/confirmation_email.html.twig')
             );
             $this->addFlash('success', "Merci de vous connecter et de cliquer sur le lien d'activation envoyé par mail");

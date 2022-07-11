@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{% block title %}
+    {% if app.request.attributes.get('_route')=='user_create' %}
+        <h1>Créer un utilisateur</h1>
+        {% elseif app.request.attributes.get('_route')=='user_edit' %}
+        <h1>Modifier un utilisateur</h1>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <div class="container w-auto">
+    <div class="row">
+        {% if app.request.attributes.get('_route')=='user_create' %}
+        {{ form_start(form, {'action' : path('user_create')}) }}
+        {% elseif app.request.attributes.get('_route')=='user_edit' %}
+            {{ form_start(form, {'action' : path('user_edit',{'id': user.id})}) }}
+        {% endif %}
+        {{ form_widget(form) }}
+
+        {% if app.request.attributes.get('_route')=='user_create' %}
+        <button type="submit" class="btn btn-success pull-right">Ajouter</button>
+        {% elseif app.request.attributes.get('_route')=='user_edit' %}
+        <button type="submit" class="btn btn-success pull-right">Modifier</button>
+        {% endif %}
+
+        {{ form_end(form) }}
+    </div>
+    </div>
+{% endblock %}
