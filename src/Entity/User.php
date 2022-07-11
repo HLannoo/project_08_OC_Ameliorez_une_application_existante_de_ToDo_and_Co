@@ -9,11 +9,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[UniqueEntity(fields: ['email'], message: 'Il existe deja un compte associé à cet email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -22,6 +22,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Assert\Email(
+        message: "l'email {{ value }} n'est pas un email valide.",
+    )]
     private $email;
 
     #[ORM\Column(type: 'string', length: 255,nullable: true )]
@@ -31,9 +34,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $roles = [];
 
     #[ORM\Column(type: 'string')]
+    #[Assert\NotBlank(message:"le champ password n'a pas été renseigné" ,)]
     private $password;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank(message:"le champ username n'a pas été renseigné" ,)]
     private $username;
 
     #[ORM\OneToMany(mappedBy: 'currentUser', targetEntity: Task::class)]
@@ -47,6 +52,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->task = new ArrayCollection();
     }
 
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
     public function getId(): ?int
     {
         return $this->id;

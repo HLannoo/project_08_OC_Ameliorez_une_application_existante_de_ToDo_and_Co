@@ -3,34 +3,42 @@
 {% block title %}Votre ToDo{% endblock %}
 
 {% block body %}
-    <a href="{{ path('task_create') }}" class="btn btn-info pull-right">Créer une tâche</a>
-    <div class="row">
-        {% for task in tasks %}
-            <div class="col-sm-12 col-lg-12 col-md-12">
-                <div class="thumbnail">
-                    <div class="caption">
-                        <h4 class="pull-right">
-                            {% if task.isDone == 1 %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span class="glyphicon glyphicon-remove"></span>{% endif %}
-                        </h4>
-                        <h4><a href="{{ path('task_edit', {'id' : task.id }) }}">{{ task.title }}</a></h4>
-                        <p>{{ task.content }}</p>
-                    </div>
-                    <div>
-                        <form action="{{ path('task_toggle', {'id' : task.id }) }}">
-                            <button class="btn btn-success btn-sm pull-right">
-                                {% if task.isDone == 0 %}Marquer comme faite{% else %}Marquer non terminée{% endif %}
-                            </button>
-                        </form>
-                        <form action="{{ path('task_delete', {'id' : task.id }) }}">
-                            <button class="btn btn-danger btn-sm pull-right">Supprimer</button>
-                        </form>
-                    </div>
+<a href="{{ path('task_create') }}" class="btn btn-info pull-right">Créer une tâche</a>
+<div class="row">
+    {% for task in tasks %}
+    <div class="col-sm-12 col-lg-12 col-md-12 ">
+        {% if task.isDone == 1 %}
+        <div class="thumbnail bg-success" style="--bs-bg-opacity: .25;">
+            {% else %}
+            <div class="thumbnail bg-danger" style="--bs-bg-opacity: .25;">
+                {% endif %}
+                <div class="caption">
+                    <h4 class="pull-right">
+                        {% if task.isDone == 1 %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span
+                                class="glyphicon glyphicon-remove"></span>{% endif %}
+                    </h4>
+
+                    <h4><a href="{{ path('task_edit', {'id' : task.id }) }}"><b>ToDo :{{ task.title }}</b></a></h4>
+                    <p class="pull-right">Appartient à : {{ task.currentUser.username }}</p>
+                    <p><b>Description: </b>{{ task.content }}</p>
+
+                </div>
+                <div>
+                    <form action="{{ path('task_toggle', {'id' : task.id }) }}">
+                        <button class="btn btn-success btn-sm pull-right">
+                            {% if task.isDone == 0 %}Marquer comme faite{% else %}Marquer non terminée{% endif %}
+                        </button>
+                    </form>
+                    <form action="{{ path('task_delete', {'id' : task.id }) }}">
+                        <button class="btn btn-danger btn-sm pull-right">Supprimer</button>
+                    </form>
                 </div>
             </div>
+        </div>
         {% else %}
             <div class="alert alert-warning" role="alert">
                 Il n'y a pas encore de tâche enregistrée.
             </div>
         {% endfor %}
     </div>
-{% endblock %}
+    {% endblock %}

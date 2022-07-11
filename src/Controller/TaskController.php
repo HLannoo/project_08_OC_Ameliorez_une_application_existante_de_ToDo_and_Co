@@ -6,6 +6,7 @@ use App\Entity\Task;
 use App\Form\TaskType;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,12 +24,13 @@ class TaskController extends AbstractController
     public function index(): Response
     {
         return $this->render('task/index.html.twig', [
-            'tasks' => $this->taskRepository->findAll()]);
+            'tasks' => $this->taskRepository->findBy(array(), array('isDone' => 'ASC'))
+        ]);
     }
 
 
     #[Route('/task/create', name: 'task_create')]
-    public function create(Request $request)
+    public function createTask(Request $request)
     {
         $task = new Task();
         $form = $this->createForm(TaskType::class,$task);
@@ -50,14 +52,15 @@ class TaskController extends AbstractController
     }
 
     #[Route('/task/{id}/edit', name: 'task_edit')]
-    public function edit($id, Request $request)
+    #[Security("is_granted('ROLE_ADMIN') or is_granted('TASK_EDIT', task)")]
+    public function editTask($id, Request $request,Task $task)
     {
-        $task = $this->taskRepository->findOneBy(['id' => $id]);
-        $form = $this->createForm(TaskType::class, $task);
+        $tasks = $this->taskRepository->findOneBy(['id' => $id]);
+        $form = $this->createForm(TaskType::class, $tasks);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-                $task->setIsDone(false);
+                $tasks->setIsDone(false);
             // $task->setCurrentUser($this->getUser());
 
             $this->em->flush();
@@ -65,21 +68,24 @@ class TaskController extends AbstractController
         }
 
         return $this->render('task/create_update.html.twig', [
-            'task' => $task,
+            'task' => $tasks,
             'form' => $form->createView()
         ]);
     }
 
     #[Route('task/{id}/delete', name: 'task_delete')]
-    public function delete($id): response
+    #[Security("is_granted('ROLE_ADMIN') or is_granted('TASK_DELETE', task)")]
+    public function deleteTask($id, Task $task): response
     {
-        $task = $this->taskRepository->findOneBy(['id' => $id]);
-        $this->em->remove($task);
+
+
+        $tasks = $this->taskRepository->findOneBy(['id' => $id]);
+        $this->em->remove($tasks);
         $this->em->flush();
 
         $this->addflash(
             'success',
-            "La tâche {$task->getTitle()} a été supprimé avec succès !"
+            "La tâche {$tasks->getTitle()} a été supprimé avec succès !"
         );
 
         return $this->redirectToRoute('task_list');
