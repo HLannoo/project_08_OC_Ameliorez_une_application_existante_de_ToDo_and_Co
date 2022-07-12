@@ -33,16 +33,16 @@ class UserVoter extends Voter
         // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
             case 'CAN_EDIT':
-                return $subject->getRoles()[0] == "ROLE_ADMIN";
+                return $subject->getRoles()[0] === "ROLE_ADMIN";
                 break;
             case 'CAN_VIEW':
-                return $subject->getRoles()[0] == "ROLE_ADMIN";
+                return $subject->getRoles()[0] === "ROLE_ADMIN";
                 break;
             case 'CAN_CREATE':
-                return $subject->getRoles()[0] == "ROLE_ADMIN";
+                return $subject->getRoles()[0] === "ROLE_ADMIN";
                 break;
             case 'CAN_DELETE':
-                return $subject->getRoles()[0] == "ROLE_ADMIN";
+                return $subject->getRoles()[0] === "ROLE_ADMIN";
                 break;
         }
 

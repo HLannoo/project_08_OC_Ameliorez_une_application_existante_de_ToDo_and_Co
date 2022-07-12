@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Task;
 use App\Form\TaskType;
 use App\Repository\TaskRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,10 +15,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class TaskController extends AbstractController
 {
-    public function __construct(protected TaskRepository $taskRepository, protected EntityManagerInterface $em)
+    public function __construct(protected TaskRepository $taskRepository, protected EntityManagerInterface $em, protected UserRepository $userRepository)
     {
         $this->taskRepository = $taskRepository;
         $this->em = $em;
+        $this->userRepository = $userRepository;
     }
 
     #[Route('/task', name: 'task_list')]
@@ -37,8 +39,17 @@ class TaskController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $task->setCreatedAt(new \DateTimeImmutable())
-                ->setIsDone(false)
-                ->setCurrentUser($this->getUser());
+                ->setIsDone(false);
+            if($this->getUser()->getRoles()[0] == "ROLE_USER" || $this->getUser()->getRoles()[0] == "ROLE_ADMIN") {
+                $task->setCurrentUser($this->getUser());
+            }
+            elseif($this->getuser()->getRoles()[0] == "ROLE_ANONYMOUS")
+            {
+                $anonymous = $this->userRepository->findOneBy([
+                    'username' => 'Anonyme'
+                ]);
+                $task->setCurrentUser($anonymous);
+            }
             $this->em->persist($task);
             $this->em->flush();
 
@@ -61,7 +72,6 @@ class TaskController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
                 $tasks->setIsDone(false);
-            // $task->setCurrentUser($this->getUser());
 
             $this->em->flush();
             return $this->redirectToRoute('task_list');
@@ -93,15 +103,16 @@ class TaskController extends AbstractController
     }
 
     #[Route('task/{id}/toggle', name: 'task_toggle')]
-    public function toggleTaskAction($id)
+    #[Security("is_granted('ROLE_ADMIN') or is_granted('TASK_TOGGLE', task)")]
+    public function toggleTaskAction($id, Task $task)
     {
-        $task = $this->taskRepository->findOneBy(['id' => $id]);
+        $tasks = $this->taskRepository->findOneBy(['id' => $id]);
 
-        if ($task->isIsDone() === false) {
-            $task->setIsDone(true);
+        if ($tasks->isIsDone() === false) {
+            $tasks->setIsDone(true);
         }
-        elseif ($task->isIsDone()=== true){
-            $task->setIsDone(false);
+        elseif ($tasks->isIsDone()=== true){
+            $tasks->setIsDone(false);
         }
         $this->em->flush();
 

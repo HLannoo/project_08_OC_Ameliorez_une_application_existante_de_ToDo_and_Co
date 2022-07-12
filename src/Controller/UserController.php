@@ -27,7 +27,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/user', name: 'user_list')]
-    #[Security("is_granted('ROLE_ADMIN') and is_granted('CAN_VIEW', user)")]
+    #[Security("is_granted('CAN_VIEW', user)")]
     public function index(): Response
     {
         return $this->render('user/index.html.twig', [
@@ -35,7 +35,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/user/create', name: 'user_create')]
-    #[Security("is_granted('ROLE_ADMIN') and is_granted('CAN_CREATE', user)")]
+    #[Security("is_granted('CAN_CREATE', user)")]
     public function createUser(Request $request)
     {
         $this->denyAccessUnlessGranted('CAN_CREATE', $this->getUser());
@@ -49,19 +49,13 @@ class UserController extends AbstractController
                 $this->passwordHasher->hashPassword(
                     $user,
                     $form->get('password')->getData()))
-                ->setRoles($form->get('roles')->getData());
+                ->setRoles($form->get('roles')->getData())
+                ->setIsVerified(1);
 
             $this->em->persist($user);
             $this->em->flush();
-            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
-                (new TemplatedEmail())
-                    ->from(new Address('h.lannoo@orange.fr', 'ToDo&Co'))
-                    ->to($user->getEmail())
-                    ->subject('Merci de confirmer votre email')
-                    ->htmlTemplate('registration/confirmation_email.html.twig')
-            );
 
-            $this->addFlash('success', "L'utilisateur a bien été ajouté, un email de confirmation lui a été envoyé.");
+            $this->addFlash('success', "L'utilisateur a bien été ajouté");
             return $this->redirectToRoute('user_list');
         }
         return $this->render('user/create_update.html.twig',
@@ -69,7 +63,7 @@ class UserController extends AbstractController
 
     }
         #[Route('/user/{id}/edit ', name: 'user_edit')]
-        #[Security("is_granted('ROLE_ADMIN') and is_granted('CAN_EDIT', user)")]
+        #[Security("is_granted('CAN_EDIT', user)")]
         public function editUser(Request $request, $id)
         {
             $user = $this->userRepository->findOneBy(['id' => $id]);

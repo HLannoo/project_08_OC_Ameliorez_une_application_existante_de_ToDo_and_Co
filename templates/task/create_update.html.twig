@@ -4,9 +4,9 @@
 
 {% block title %}
     {% if app.request.attributes.get('_route')=='task_create' %}
-        <h1>Créer une tâche</h1>
+        Créer une tâche
         {% elseif app.request.attributes.get('_route')=='task_edit' %}
-        <h1>Modifier une tâche</h1>
+        Modifier une tâche
     {% endif %}
 {% endblock %}
 

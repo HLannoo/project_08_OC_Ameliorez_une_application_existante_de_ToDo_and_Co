@@ -49,6 +49,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
+        $this->roles = ["ROLE_ANONYMOUS"];
         $this->task = new ArrayCollection();
     }
 
@@ -90,8 +91,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        // guarantee every user at least has ROLE_ANONYMOUS
+        $roles[] = 'ROLE_ANONYMOUS';
 
         return array_unique($roles);
     }
