@@ -23,6 +23,7 @@
                     <p><b>Description: </b>{{ task.content }}</p>
 
                 </div>
+                {%  if app.user and app.user.isVerified == true %}
                 <div>
                     <form action="{{ path('task_toggle', {'id' : task.id }) }}">
                         <button class="btn btn-success btn-sm pull-right">
@@ -33,8 +34,10 @@
                         <button class="btn btn-danger btn-sm pull-right">Supprimer</button>
                     </form>
                 </div>
+                {% endif %}
             </div>
         </div>
+
         {% else %}
             <div class="alert alert-warning" role="alert">
                 Il n'y a pas encore de tâche enregistrée.

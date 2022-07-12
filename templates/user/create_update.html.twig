@@ -4,9 +4,9 @@
 
 {% block title %}
     {% if app.request.attributes.get('_route')=='user_create' %}
-        <h1>Créer un utilisateur</h1>
+        Créer un utilisateur
         {% elseif app.request.attributes.get('_route')=='user_edit' %}
-        <h1>Modifier un utilisateur</h1>
+        Modifier un utilisateur
     {% endif %}
 {% endblock %}
 

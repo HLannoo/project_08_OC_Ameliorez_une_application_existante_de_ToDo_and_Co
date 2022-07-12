@@ -11,6 +11,7 @@ class TaskVoter extends Voter
 {
     public const EDIT = 'TASK_EDIT';
     public const DELETE = 'TASK_DELETE';
+    public const TOGGLE = 'TASK_TOGGLE';
 
     function __construct(protected TaskRepository $taskRepository)
     {
@@ -20,7 +21,7 @@ class TaskVoter extends Voter
     {
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
-        return in_array($attribute, ['TASK_EDIT','TASK_DELETE'])
+        return in_array($attribute, ['TASK_EDIT','TASK_DELETE','TASK_TOGGLE'])
             && $subject instanceof \App\Entity\Task;
     }
 
@@ -35,11 +36,13 @@ class TaskVoter extends Voter
         // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
             case 'TASK_EDIT':
-
-                return $user === $subject->getCurrentUser();
+                return $user === $subject->getCurrentUser() && $user->getRoles()[0] === "ROLE_USER";
                 break;
             case 'TASK_DELETE':
-                return $user === $subject->getCurrentUser();
+                    return $user === $subject->getCurrentUser() && $user->getRoles()[0] === "ROLE_USER";
+                break;
+            case 'TASK_TOGGLE':
+                    return $user === $subject->getCurrentUser() && $user->getRoles()[0] === "ROLE_USER";
                 break;
         }
 
