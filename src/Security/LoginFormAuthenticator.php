@@ -2,6 +2,8 @@
 
 namespace App\Security;
 
+use App\Repository\UserRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,17 +19,17 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 
 class LoginFormAuthenticator extends AbstractAuthenticator
 
-{
-    private UrlGeneratorInterface $urlGenerator;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator)
+{
+
+    public function __construct(private UrlGeneratorInterface $urlGenerator, protected UserRepository $userRepository)
     {
         $this->urlGenerator = $urlGenerator;
+        $this->userRepository = $userRepository;
     }
 
     public function supports(Request $request): ?bool
     {
-
         return $request->attributes->get('_route') === 'security_login'
             && $request->isMethod('POST');
     }
@@ -47,6 +49,7 @@ class LoginFormAuthenticator extends AbstractAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+
         return new RedirectResponse($this->urlGenerator->generate('task_list'));
 
     }
@@ -54,9 +57,12 @@ class LoginFormAuthenticator extends AbstractAuthenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
 
     {
+
         return $request->getSession()->set(Security::AUTHENTICATION_ERROR,$exception);
 
     }
+
+
 
 //    public function start(Request $request, AuthenticationException $authException = null): Response
 //    {
