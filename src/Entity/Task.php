@@ -25,7 +25,7 @@ class Task
     #[ORM\Column(type: 'boolean')]
     private $isDone;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'task')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'task', cascade:['detach'])]
     private $currentUser;
 
     public function getId(): ?int

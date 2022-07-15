@@ -49,7 +49,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->roles = ["ROLE_ANONYMOUS"];
+        $this->roles = ["ROLE_USER"];
         $this->task = new ArrayCollection();
     }
 
@@ -158,6 +158,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function addTasks(Task $task): self
+    {
+        if (!$this->task->contains($task[])) {
+            $this->task[] = $task;
+            $task->setCurrentUser($this);
+        }
+
+        return $this;
+    }
+
     public function removeTask(Task $task): self
     {
         if ($this->task->removeElement($task)) {
@@ -191,5 +201,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->token = $token;
 
         return $this;
+    }
+
+    public function becomeAnonymous()
+    {
+
     }
 }

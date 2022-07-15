@@ -19,9 +19,12 @@ security:
             form_login: ~
             custom_authenticator:
                 - App\Security\LoginFormAuthenticator
+            user_checker: App\Security\UserChecker
+            access_denied_handler: App\Security\AccessDeniedHandler
             logout:
                 path: security_logout
                 target: security_login
+
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall

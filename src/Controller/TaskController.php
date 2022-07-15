@@ -71,7 +71,6 @@ class TaskController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-                $tasks->setIsDone(false);
 
             $this->em->flush();
             return $this->redirectToRoute('task_list');
@@ -99,7 +98,6 @@ class TaskController extends AbstractController
         );
 
         return $this->redirectToRoute('task_list');
-
     }
 
     #[Route('task/{id}/toggle', name: 'task_toggle')]

@@ -2,16 +2,16 @@
 
 namespace App\Controller;
 
+use App\Entity\Task;
 use App\Entity\User;
 use App\Form\UserType;
+use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -68,14 +68,11 @@ class UserController extends AbstractController
         {
             $user = $this->userRepository->findOneBy(['id' => $id]);
             $form = $this->createForm(UserType::class, $user);
+            $form->remove("password");
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
-                $user->setPassword(
-                    $this->passwordHasher->hashPassword(
-                        $user,
-                        $form->get('password')->getData()))
-                    ->setRoles($form->get('roles')->getData());
+                $user->setRoles($form->get('roles')->getData());
 
                 $this->em->flush();
                 $this->addFlash('success', "L'utilisateur a bien été modifié");
@@ -85,5 +82,28 @@ class UserController extends AbstractController
             }
             return $this->render('user/create_update.html.twig', ['form' => $form->createView(), 'user' => $user]);
         }
+
+    #[Route('user/{id}/delete', name: 'user_delete')]
+    #[Security("is_granted('CAN_DELETE', user)")]
+    public function deleteTask($id, User $user, TaskRepository $taskRepository, Task $task): response
+    {
+        $users = $this->userRepository->findOneBy(['id' => $id]);
+        $tasks = $taskRepository->findBy(array('currentUser' => $users));
+        $anonymousUser = $this->userRepository->findOneBy(['username' => "Anonyme"]);
+        foreach ($tasks as $task){
+            $task->setCurrentUser($anonymousUser);
+            $this->em->persist($task);
+        }
+        $this->em->remove($users);
+        $this->em->flush();
+
+        $this->addflash(
+            'success',
+            "Le user {$users->getUsername()} a été supprimé avec succès !"
+        );
+
+        return $this->redirectToRoute('user_list');
+
+    }
 
 }
