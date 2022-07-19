@@ -23,23 +23,28 @@
                             {% endif %}
                             <b>ToDo :{{ task.title }}</b></a>
                     </h4>
-                    <p class="pull-right">Appartient à : {{ task.currentUser.username }}</p>
+                    <p class="pull-right"> Appartient à : {{ task.currentUser.username }}</p>
                     <p><b>Description: </b>{{ task.content }}</p>
-
+                    <p class="pull-right"> Mise à jour le : {{ task.createdAt | date('d/m/Y',"Europe/Paris") }}
+                        à {{ task.createdAt | date('H:i:s',"Europe/Paris") }}</p>
+                    <br/>
                 </div>
-                {% if app.user.id == task.currentuser.id or app.user.roles[0] == "ROLE_ADMIN" %}
-                    <div>
-                        <form action="{{ path('task_toggle', {'id' : task.id }) }}">
-                            <button class="btn btn-success btn-sm pull-right">
-                                {% if task.isDone == 0 %}Marquer comme faite{% else %}Marquer non terminée{% endif %}
-                            </button>
-                        </form>
-                        <form action="{{ path('task_delete', {'id' : task.id }) }}">
-                            <button class="btn btn-danger btn-sm pull-right">Supprimer</button>
-                        </form>
-                    </div>
-                {% endif %}
             </div>
+            {% if app.user.id == task.currentuser.id or app.user.roles[0] == "ROLE_ADMIN" %}
+                <div>
+                    <form action="{{ path('task_toggle', {'id' : task.id }) }}">
+                        <button class="btn btn-success btn-sm pull-right">
+                            {% if task.isDone == 0 %}Marquer comme faite{% else %}Marquer non terminée{% endif %}
+                        </button>
+                    </form>
+                    <form action="{{ path('task_delete', {'id' : task.id }) }}">
+                        <button class="btn btn-danger btn-sm pull-right">Supprimer</button>
+                    </form>
+                </div>
+            {% else %}
+                <br/>
+            {% endif %}
+
         </div>
 
         {% else %}
