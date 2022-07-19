@@ -26,7 +26,7 @@ class TaskController extends AbstractController
     public function index(): Response
     {
         return $this->render('task/index.html.twig', [
-            'tasks' => $this->taskRepository->findBy(array(), array('isDone' => 'ASC'))
+            'tasks' => $this->taskRepository->findBy(array(), array('isDone' => 'ASC','createdAt'=>'DESC'))
         ]);
     }
 
@@ -71,7 +71,7 @@ class TaskController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
+            $task->setCreatedAt(new \DateTimeImmutable());
             $this->em->flush();
             return $this->redirectToRoute('task_list');
         }
