@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Entity;
 
 use App\Entity\Task;
 use App\Entity\User;
@@ -102,15 +102,6 @@ class UserTest extends TestCase
         }
         catch(\Exception $exception){
             $this->assertStringContainsString("La nombre de tâche est différent du nombre de tache réellement ajoutée", $exception->getMessage());
-        }
-
-        try {
-
-            $tasks = $user->getTask();
-            $this->assertSame($user->getTask(), $tasks);
-        }
-        catch(\Exception $exception){
-            $this->assertStringContainsString("La tâche n'a pas pu être récupérée", $exception->getMessage());
         }
 
         try {
