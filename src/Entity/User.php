@@ -122,7 +122,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+         $this->Password = null;
     }
 
     public function getUsername(): ?string
@@ -148,16 +148,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function addTask(Task $task): self
     {
         if (!$this->task->contains($task)) {
-            $this->task[] = $task;
-            $task->setCurrentUser($this);
-        }
-
-        return $this;
-    }
-
-    public function addTasks(Task $task): self
-    {
-        if (!$this->task->contains($task[])) {
             $this->task[] = $task;
             $task->setCurrentUser($this);
         }

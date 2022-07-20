@@ -90,6 +90,7 @@ class UserController extends AbstractController
         $users = $this->userRepository->findOneBy(['id' => $id]);
         $tasks = $taskRepository->findBy(array('currentUser' => $users));
         $anonymousUser = $this->userRepository->findOneBy(['username' => "Anonyme"]);
+
         foreach ($tasks as $task){
             $task->setCurrentUser($anonymousUser);
             $this->em->persist($task);
