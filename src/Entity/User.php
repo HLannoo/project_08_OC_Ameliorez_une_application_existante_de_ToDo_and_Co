@@ -49,7 +49,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->roles = ["ROLE_USER"];
         $this->task = new ArrayCollection();
     }
 
@@ -91,8 +90,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_ANONYMOUS
-        $roles[] = 'ROLE_ANONYMOUS';
 
         return array_unique($roles);
     }
@@ -125,7 +122,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials()
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        // $this->PlainPassword = null;
     }
 
     public function getUsername(): ?string
@@ -151,16 +148,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function addTask(Task $task): self
     {
         if (!$this->task->contains($task)) {
-            $this->task[] = $task;
-            $task->setCurrentUser($this);
-        }
-
-        return $this;
-    }
-
-    public function addTasks(Task $task): self
-    {
-        if (!$this->task->contains($task[])) {
             $this->task[] = $task;
             $task->setCurrentUser($this);
         }
@@ -201,10 +188,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->token = $token;
 
         return $this;
-    }
-
-    public function becomeAnonymous()
-    {
-
     }
 }
