@@ -4,7 +4,6 @@ namespace App\Tests\Entity;
 
 use App\Entity\Task;
 use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 
 class UserTest extends TestCase
@@ -22,7 +21,7 @@ class UserTest extends TestCase
                 ->setToken('testToken');
         $this->task = New Task;
     }
-    public function testIsTrue(): void
+    public function testGetIsTrue(): void
     {
 
         $this->assertTrue('test@gmail.com' === $this->user->getEmail());
@@ -33,7 +32,7 @@ class UserTest extends TestCase
         $this->assertTrue('testToken' === $this->user->getToken());
     }
 
-    public function testIsFalse(): void
+    public function testGetIsFalse(): void
     {
         $this->assertFalse('false@gmail.com' === $this->user->getEmail());
         $this->assertFalse('falseusername' === $this->user->getUsername());
@@ -43,7 +42,7 @@ class UserTest extends TestCase
         $this->assertFalse('falseToken' === $this->user->getToken());
     }
 
-    public function testIsEmpty(): void
+    public function testGetIsEmpty(): void
     {
         $user = new User;
 

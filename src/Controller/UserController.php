@@ -85,7 +85,7 @@ class UserController extends AbstractController
 
     #[Route('user/{id}/delete', name: 'user_delete')]
     #[Security("is_granted('CAN_DELETE', user)")]
-    public function deleteTask($id, User $user, TaskRepository $taskRepository, Task $task): response
+    public function deleteTask($id, TaskRepository $taskRepository): response
     {
         $users = $this->userRepository->findOneBy(['id' => $id]);
         $tasks = $taskRepository->findBy(array('currentUser' => $users));
