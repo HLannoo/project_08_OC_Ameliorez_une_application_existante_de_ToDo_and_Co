@@ -3,20 +3,58 @@
 namespace App\Tests\Controller;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class SecurityControllerTest extends WebTestCase
 {
-    public function setUp():void{
+    private $user;
+    private $client;
+    private $testUser;
+
+    public function setUp(): void
+    {
         $this->client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $this->testUser = $userRepository->findOneByEmail('bernard92@free.fr');
+
     }
 
-    public function testLoginIsUp(): void
+    public function testConnexionWithBadCredentials(): void
     {
-        $userRepository = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class);
-        $testUser = $userRepository->findOneByEmail();
-        $urlGeneration = $this->client->getContainer()->get('router.default');
-        $this->client->request(Request::METHOD_GET, $urlGeneration->generate('security_login'));
+        $this->client->request('GET', '/login');
+        $this->client->submitForm('Connexion',[
+            'login[email]' => 'false@Gmail.com',
+            'login[password]' => 'falsePassword'
+        ]);
+        $this->assertSelectorTextContains('', 'Bad credentials.');
+
     }
+
+    public function testConnexionWithGoodCredentials(): void
+    {
+
+        $this->client->request('GET', '/login');
+        $this->client->submitForm('Connexion',[
+            'login[email]' => 'suzanne.texier@besnard.com',
+            'login[password]' => 'password'
+        ]);
+        $this->client->followRedirect();
+        $this->assertEquals('/task',$this->client->getRequest()->getRequestUri());
+
+    }
+
+
+    public function testDisconnectButtonWhenUserIsLogged(): void
+    {
+        $this->client->loginUser($this->testUser);
+        $this->client->request('GET', '/user');
+        $this->client->clickLink('Déconnexion');
+        $this->client->followRedirect();
+        $this->assertEquals('/login',$this->client->getRequest()->getRequestUri());
+
+    }
+
+
 }
