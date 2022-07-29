@@ -13,15 +13,16 @@ class ToDoFixtures extends Fixture
 {
     public function __construct(protected UserPasswordHasherInterface $passwordHasher)
     {
-        $this->passwordHasher = $passwordHasher;
+        $this->passwordHasher = $this->passwordHasher;
     }
+
     public function load(ObjectManager $manager): void
     {
         $faker = Factory::create('fr_FR');
 
 
         for ($i = 0; $i < 10; $i++) {
-            $user = new User();
+            $user = new User;
             $hashedPassword = $this->passwordHasher->hashPassword(
                 $user,
                 "password"
@@ -35,7 +36,7 @@ class ToDoFixtures extends Fixture
             $manager->persist($user);
 
             for ($a = 0; $a < 5; $a++) {
-                $task = new Task();
+                $task = new Task;
                 $task->setTitle($faker->text(15))
                     ->setContent($faker->paragraph(1))
                     ->setCurrentUser($user)
@@ -43,52 +44,74 @@ class ToDoFixtures extends Fixture
                     ->setIsDone(false);
 
                 $manager->persist($task);
-                }
+            }
+            $manager->flush();
         }
 
         for ($u = 0; $u < 1; $u++) {
-            $admin = new User();
+            $adminTest = new User;
             $hashedPassword = $this->passwordHasher->hashPassword(
-                $user,
+                $adminTest,
                 "password"
             );
-            $admin->setUserName($faker->firstName)
-                ->setEmail($faker->email)
+            $adminTest->setUserName("Admin")
+                ->setEmail("admin-test@gmail.com")
                 ->setPassword($hashedPassword)
                 ->setRoles(["ROLE_ADMIN"])
                 ->setIsVerified(1);
 
-            $manager->persist($admin);
+            $manager->persist($adminTest);
 
-            $anonyme = new User();
-            $anonyme->setUserName("Anonyme")
-                ->setEmail($faker->email)
+            $anonymeTest = new User;
+            $anonymeTest->setUserName("Anonyme")
+                ->setEmail("anonymous-test@gmail.com")
                 ->setPassword($hashedPassword)
                 ->setRoles(["ROLE_USER"])
                 ->setIsVerified(1);
 
-            $manager->persist($anonyme);
+            $manager->persist($anonymeTest);
 
-            for ($a = 0; $a < 5; $a++) {
-                $task = new Task();
-                $task->setTitle($faker->text(15))
-                    ->setContent($faker->paragraph(1))
-                    ->setCurrentUser($anonyme)
-                    ->setCreatedAt(new \DateTimeImmutable())
-                    ->setIsDone(false);
-                for ($a = 0; $a < 5; $a++) {
-                    $task = new Task();
-                    $task->setTitle($faker->text(15))
-                        ->setContent($faker->paragraph(1))
-                        ->setCurrentUser($admin)
-                        ->setCreatedAt(new \DateTimeImmutable())
-                        ->setIsDone(false);
+            $userTest = new User;
+            $userTest->setUserName("User")
+                ->setEmail("user-test@gmail.com")
+                ->setPassword($hashedPassword)
+                ->setRoles(["ROLE_USER"])
+                ->setIsVerified(1);
 
-                    $manager->persist($task);
-                }
-            }
+            $manager->persist($userTest);
+
         }
 
-        $manager->flush();
+        for ($a = 0; $a < 5; $a++) {
+            $anonymeTask = new Task;
+            $anonymeTask->setTitle($faker->text(15))
+                ->setContent($faker->paragraph(1))
+                ->setCurrentUser($anonymeTest)
+                ->setCreatedAt(new \DateTimeImmutable())
+                ->setIsDone(false);
+
+            $manager->persist($anonymeTask);
+
+            $adminTask = new Task;
+            $adminTask->setTitle($faker->text(15))
+                ->setContent($faker->paragraph(1))
+                ->setCurrentUser($adminTest)
+                ->setCreatedAt(new \DateTimeImmutable())
+                ->setIsDone(false);
+
+            $manager->persist($adminTask);
+
+            $userTask = new Task;
+            $userTask->setTitle($faker->text(15))
+                ->setContent($faker->paragraph(1))
+                ->setCurrentUser($userTest)
+                ->setCreatedAt(new \DateTimeImmutable())
+                ->setIsDone(false);
+
+            $manager->persist($userTask);
+
+            $manager->flush();
+        }
+
     }
 }

@@ -20,8 +20,8 @@ class UserControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
         $this->userRepository = static::getContainer()->get(UserRepository::class);
-        $this->testAdmin = $this->userRepository->findOneByEmail('bernard92@free.fr'); // Il s'agit d'un administrateur
-        $this->testUser = $this->userRepository->findOneByEmail('astrid.barbe@royer.fr'); // Il s'agit d'un simple utilisateur
+        $this->testAdmin = $this->userRepository->findOneByEmail('admin-test@gmail.com'); // Il s'agit d'un administrateur
+        $this->testUser = $this->userRepository->findOneByEmail('user-test@gmail.com'); // Il s'agit d'un simple utilisateur
 
     }
 
