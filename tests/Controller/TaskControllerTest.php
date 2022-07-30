@@ -26,14 +26,10 @@ class TaskControllerTest extends WebTestCase
         $this->userRepository = static::getContainer()->get(UserRepository::class);
         $this->testAdmin = $this->userRepository->findOneByEmail('admin-test@gmail.com'); // Il s'agit d'un administrateur
         $this->testUser = $this->userRepository->findOneByEmail('user-test@gmail.com'); // Il s'agit d'un simple utilisateur
-        $this->testAnonymous = $this->userRepository->findOneByEmail('anonymous-test@gmail.com');
+        $this->testAnonymous = $this->userRepository->findOneByEmail('anonymous-test@gmail.com'); // Il s'agit de l'utilisateur anonyme
         $this->taskRepository = static::getContainer()->get(TaskRepository::class);
     }
 
-
-    /**
-     * @covers TaskController::index
-     */
     public function testTaskPageRedirectWhenUserIsNotConnected(): void
     {
 
@@ -44,9 +40,7 @@ class TaskControllerTest extends WebTestCase
         $this->assertSelectorTextContains('h1', 'Connexion');
     }
 
-    /**
-     * @covers TaskController::index
-     */
+
     public function testTaskPageWhenUserIsConnected(): void
     {
         $this->client->loginUser($this->testUser);
@@ -70,12 +64,8 @@ class TaskControllerTest extends WebTestCase
         $this->client->loginUser($this->testAnonymous);
         $crawler = $this->client->request('GET', '/task/create');
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-
-        $form = $crawler->selectButton('Ajouter')->form([
-            'task[title]' => 'testTitle',
-            'task[content]'=>'testContent',
-        ]);
-        $this->client->submit($form);
+        $buttonName = "Ajouter";
+        $this->makeForm($crawler, $buttonName);
 
         $this->client->followRedirect();
         $this->assertSelectorTextContains('',"La tâche a été bien été ajoutée à la liste.");
@@ -160,5 +150,18 @@ class TaskControllerTest extends WebTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
         $this->client->followRedirect();
         $this->assertSelectorTextContains('',"La tâche {$id->getTitle()} a été supprimé avec succès !");
+    }
+
+    private function makeForm($crawler, $buttonName)
+    {
+        $form = $crawler->selectButton($buttonName)->form([
+            'task[title]' => "testTitle",
+            'task[content]'=> "testContent",
+        ]);
+        $this->client->submit($form);
+    }
+    public function tearDown(): void
+    {
+
     }
 }
