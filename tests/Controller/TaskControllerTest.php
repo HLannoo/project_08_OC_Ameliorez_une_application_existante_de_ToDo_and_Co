@@ -5,6 +5,7 @@ namespace App\Tests\Controller;
 use App\Entity\Task;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -28,6 +29,7 @@ class TaskControllerTest extends WebTestCase
         $this->testUser = $this->userRepository->findOneByEmail('user-test@gmail.com'); // Il s'agit d'un simple utilisateur
         $this->testAnonymous = $this->userRepository->findOneByEmail('anonymous-test@gmail.com'); // Il s'agit de l'utilisateur anonyme
         $this->taskRepository = static::getContainer()->get(TaskRepository::class);
+
     }
 
     public function testTaskPageRedirectWhenUserIsNotConnected(): void
@@ -61,39 +63,33 @@ class TaskControllerTest extends WebTestCase
 
     public function testCreateTaskPageWhenUserIsConnected(): void
     {
-        $this->client->loginUser($this->testAnonymous);
-        $crawler = $this->client->request('GET', '/task/create');
-        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        $buttonName = "Ajouter";
-        $this->makeForm($crawler, $buttonName);
-
+        $formDatas = ["testTitle1", "testContent1"];
+        $user = $this->testUser;
+        $this->CreateFormWhitDiferentUser($formDatas,$user);
+        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
         $this->client->followRedirect();
         $this->assertSelectorTextContains('',"La tâche a été bien été ajoutée à la liste.");
-        $this->assertInstanceOf(Task::class, $this->taskRepository->findOneByTitle('testTitle'));
+        $this->assertInstanceOf(Task::class, $this->taskRepository->findOneByTitle('testTitle1'));
     }
 
     public function testEditTaskPageRedirectWhenUserIsNotConnected(): void
     {
-        $this->taskRepository->findOneByTitle('testTitle');
-        $this->client->request('GET', '/task/create');
-        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
+        $id = $this->taskRepository->findOneByTitle('TestTaskAnonymous0');
+        $this->client->request('GET', '/task/'.$id->getId().'/edit');
+        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
         $this->client->followRedirect();
         $this->assertSelectorTextContains('h1', 'Connexion');
     }
 
     public function testEditTaskPageWhenUserIsConnected(): void
     {
-        $this->client->loginUser($this->testAnonymous);
-        $id = $this->taskRepository->findOneByTitle('testTitle');
-        $crawler = $this->client->request('GET', '/task/'.$id->getId().'/edit');
-        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $user= $this->testAnonymous;
+        $id = $this->taskRepository->findOneByTitle('TestTaskAnonymous1'); // le titre a été ajouté au préalable dans les fixtures
+        $formDatas = ["modifyTitle1", "modifyContent1"];
+        $this->EditFormWhitDiferentUser($formDatas,$user, $id);
 
-        $form = $crawler->selectButton('Editer')->form([
-            'task[title]' => 'modifyTitle',
-            'task[content]'=>'modifyContent',
-        ]);
-        $this->client->submit($form);
+        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
         $this->client->followRedirect();
         $this->assertSelectorTextContains('',"La tâche a été mise à jour !");
     }
@@ -101,7 +97,7 @@ class TaskControllerTest extends WebTestCase
     public function testToggleTaskRedirectWithNoAuthorization(): void
     {
         $this->client->loginUser($this->testUser);
-        $id = $this->taskRepository->findOneByTitle('modifyTitle');
+        $id = $this->taskRepository->findOneByTitle('TestTaskAnonymous2'); // le titre a été ajouté au préalable dans les fixtures
         $this->client->request('GET', '/task/'.$id->getId().'/toggle');
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
@@ -112,7 +108,7 @@ class TaskControllerTest extends WebTestCase
     public function testToggleTaskRedirectWithAuthorization(): void
     {
         $this->client->loginUser($this->testAnonymous);
-        $id = $this->taskRepository->findOneByTitle('modifyTitle');
+        $id = $this->taskRepository->findOneByTitle('TestTaskAnonymous3'); // le titre a été ajouté au préalable dans les fixtures
         $this->client->request('GET', '/task/'.$id->getId().'/toggle');
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
@@ -122,7 +118,8 @@ class TaskControllerTest extends WebTestCase
 
     public function testDeleteTaskPageRedirectWhenUserIsNotConnected(): void
     {
-        $id = $this->taskRepository->findOneByTitle('modifyTitle');
+
+        $id = $this->taskRepository->findOneByTitle('TestTaskAnonymous4'); // le titre a été ajouté au préalable dans les fixtures
         $this->client->request('GET', '/task/'.$id->getId().'/delete');
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
@@ -133,7 +130,7 @@ class TaskControllerTest extends WebTestCase
     public function testDeleteAnonymousTaskWithNoAuthorization(): void
     {
         $this->client->loginUser($this->testUser);
-        $id = $this->taskRepository->findOneByTitle('modifyTitle');
+        $id = $this->taskRepository->findOneByTitle('TestTaskAnonymous5'); // le titre a été ajouté au préalable dans les fixtures
         $this->client->request('GET', '/task/'.$id->getId().'/delete');
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
@@ -144,24 +141,38 @@ class TaskControllerTest extends WebTestCase
 
     public function testDeleteAnonymousTaskWhenUserIsAdmin(): void
     {
+        $user = $this->testAnonymous;
+        $formDatas = ["testTitleAdmin", "testContentAdmin"];
+        $this->CreateFormWhitDiferentUser($formDatas,$user);
+
         $this->client->loginUser($this->testAdmin);
-        $id = $this->taskRepository->findOneByTitle('modifyTitle');
+        $id = $this->taskRepository->findOneByTitle('testTitleAdmin');
         $this->client->request('GET', '/task/'.$id->getId().'/delete');
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
         $this->client->followRedirect();
         $this->assertSelectorTextContains('',"La tâche {$id->getTitle()} a été supprimé avec succès !");
     }
 
-    private function makeForm($crawler, $buttonName)
+    private function CreateFormWhitDiferentUser($formDatas, $user)
     {
-        $form = $crawler->selectButton($buttonName)->form([
-            'task[title]' => "testTitle",
-            'task[content]'=> "testContent",
+        $this->client->loginUser($user);
+        $crawler = $this->client->request('GET', '/task/create');
+        $form = $crawler->selectButton("Ajouter")->form([
+            'task[title]' => $formDatas[0],
+            'task[content]'=> $formDatas[1],
         ]);
-        $this->client->submit($form);
+        return $this->client->submit($form);
     }
-    public function tearDown(): void
-    {
 
+    private function EditFormWhitDiferentUser($formDatas, $user, $id)
+    {
+        $this->client->loginUser($user);
+        $crawler = $this->client->request('GET', '/task/'.$id->getId().'/edit');
+        $form = $crawler->selectButton("Editer")->form([
+            'task[title]' => $formDatas[0],
+            'task[content]'=> $formDatas[1],
+        ]);
+        return $this->client->submit($form);
     }
+
 }
