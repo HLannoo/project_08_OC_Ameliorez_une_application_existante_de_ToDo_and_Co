@@ -73,6 +73,11 @@ class TaskController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $task->setCreatedAt(new \DateTimeImmutable());
             $this->em->flush();
+
+            $this->addflash(
+                'success',
+                "La tâche a été mise à jour !"
+            );
             return $this->redirectToRoute('task_list');
         }
 

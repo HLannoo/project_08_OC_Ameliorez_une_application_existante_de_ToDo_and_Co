@@ -17,7 +17,7 @@ class SecurityControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
         $userRepository = static::getContainer()->get(UserRepository::class);
-        $this->testUser = $userRepository->findOneByEmail('bernard92@free.fr');
+        $this->testUser = $userRepository->findOneByEmail('user-test@gmail.com');
 
     }
 
@@ -37,7 +37,7 @@ class SecurityControllerTest extends WebTestCase
 
         $this->client->request('GET', '/login');
         $this->client->submitForm('Connexion',[
-            'login[email]' => 'suzanne.texier@besnard.com',
+            'login[email]' => 'user-test@gmail.com',
             'login[password]' => 'password'
         ]);
         $this->client->followRedirect();
@@ -49,7 +49,7 @@ class SecurityControllerTest extends WebTestCase
     public function testDisconnectButtonWhenUserIsLogged(): void
     {
         $this->client->loginUser($this->testUser);
-        $this->client->request('GET', '/user');
+        $this->client->request('GET', '/task');
         $this->client->clickLink('Déconnexion');
         $this->client->followRedirect();
         $this->assertEquals('/login',$this->client->getRequest()->getRequestUri());
