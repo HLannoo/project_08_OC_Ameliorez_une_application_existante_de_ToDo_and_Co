@@ -6,6 +6,9 @@ use App\Entity\Task;
 use App\Entity\User;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \App\Entity\Task
+ */
 class TaskTest extends TestCase
 {
     private $user;

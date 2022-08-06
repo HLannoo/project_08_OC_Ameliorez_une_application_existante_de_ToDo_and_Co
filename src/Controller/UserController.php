@@ -40,7 +40,7 @@ class UserController extends AbstractController
     {
         $this->denyAccessUnlessGranted('CAN_CREATE', $this->getUser());
         $user = New User();
-        $form = $this->createForm(UserType::CLASS, $user);
+        $form = $this->createForm(UserType::Class, $user);
         $form->handleRequest($request);
 
 
@@ -85,7 +85,7 @@ class UserController extends AbstractController
 
     #[Route('user/{id}/delete', name: 'user_delete')]
     #[Security("is_granted('CAN_DELETE', user)")]
-    public function deleteTask($id, TaskRepository $taskRepository): response
+    public function deleteUser($id, TaskRepository $taskRepository): response
     {
         $users = $this->userRepository->findOneBy(['id' => $id]);
         $tasks = $taskRepository->findBy(array('currentUser' => $users));

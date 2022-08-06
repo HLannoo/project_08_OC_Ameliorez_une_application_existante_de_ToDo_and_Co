@@ -7,11 +7,15 @@ use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+/**
+ * @covers \App\Controller\SecurityController
+ */
 class SecurityControllerTest extends WebTestCase
 {
     private $user;
     private $client;
     private $testUser;
+
 
     public function setUp(): void
     {
@@ -20,6 +24,7 @@ class SecurityControllerTest extends WebTestCase
         $this->testUser = $userRepository->findOneByEmail('user-test@gmail.com');
 
     }
+
 
     public function testConnexionWithBadCredentials(): void
     {
@@ -44,6 +49,7 @@ class SecurityControllerTest extends WebTestCase
         $this->assertEquals('/task',$this->client->getRequest()->getRequestUri());
 
     }
+
 
 
     public function testDisconnectButtonWhenUserIsLogged(): void
