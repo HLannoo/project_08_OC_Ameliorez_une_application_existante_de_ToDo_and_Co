@@ -6,10 +6,11 @@ use App\Entity\User;
 
 use App\Repository\UserRepository;
 use App\Services\ChangeRoles;
+use App\Tests\Fixtures\ToDoFixturesTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class ChangeRolesTest extends WebTestCase
+class ChangeRolesTest extends ToDoFixturesTest
 {
 
     private $changeRole;
@@ -17,6 +18,8 @@ class ChangeRolesTest extends WebTestCase
     private $client;
     public function setUp(): void
     {
+        $this->initializeTest();
+        self::ensureKernelShutdown();
         $this->client = static::createClient();
         $this->changeRole = static::getContainer()->get(ChangeRoles::class);
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
@@ -24,7 +27,6 @@ class ChangeRolesTest extends WebTestCase
 
 
     }
-
 
     public function testChangeRolesServices(): void
     {
@@ -39,5 +41,9 @@ class ChangeRolesTest extends WebTestCase
         $this->changeRole->upgradeGuest($user);
         $this->assertTrue($user->getRoles() === ['ROLE_USER']);
 
+    }
+    protected function tearDown(): void
+    {
+        $this->tearDownTest();
     }
 }

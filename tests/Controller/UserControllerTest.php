@@ -4,13 +4,15 @@ namespace App\Tests\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Tests\Fixtures\ToDoFixturesTest;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @covers \App\Controller\UserController
  */
-class UserControllerTest extends WebTestCase
+class UserControllerTest extends ToDoFixturesTest
 {
 
     private $client;
@@ -18,8 +20,12 @@ class UserControllerTest extends WebTestCase
     private $testUser;
     private $userRepository;
 
+
     public function setUp(): void
     {
+
+        $this->initializeTest();
+        self::ensureKernelShutdown();
         $this->client = static::createClient();
         $this->userRepository = static::getContainer()->get(UserRepository::class);
         $this->testAdmin = $this->userRepository->findOneByEmail('admin-test@gmail.com'); // Il s'agit d'un administrateur
@@ -170,6 +176,11 @@ class UserControllerTest extends WebTestCase
             'user[username]'=> $data[2],
         ]);
         return $this->client->submit($form);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->tearDownTest();
     }
 
 

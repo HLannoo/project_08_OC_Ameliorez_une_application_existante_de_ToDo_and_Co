@@ -3,18 +3,19 @@
 namespace App\Tests\Controller;
 
 use App\Entity\User;
-use App\Repository\TaskRepository;
+use  App\Tests\Fixtures\ToDoFixturesTest ;
 use App\Repository\UserRepository;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class RegistrationControllerTest extends WebTestCase
+class RegistrationControllerTest extends ToDoFixturesTest
 {
     private $client;
     private $userRepository;
 
     public function setUp(): void
     {
+        $this->initializeTest();
+        self::ensureKernelShutdown();
         $this->client = static::createClient();
         $this->userRepository = static::getContainer()->get(UserRepository::class);
 
@@ -51,5 +52,9 @@ class RegistrationControllerTest extends WebTestCase
             'registration_form[password][second]' => $data[2],
             'registration_form[agreeTerms]' => $data[3] ,
         ]);
+    }
+    protected function tearDown(): void
+    {
+        $this->tearDownTest();
     }
 }

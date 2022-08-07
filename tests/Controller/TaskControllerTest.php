@@ -6,11 +6,11 @@ namespace App\Tests\Controller;
 use App\Entity\Task;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Tests\Fixtures\ToDoFixturesTest;
 use Symfony\Component\HttpFoundation\Response;
 
 
-class TaskControllerTest extends WebTestCase
+class TaskControllerTest extends ToDoFixturesTest
 {
     private $client;
     private $testAdmin;
@@ -20,6 +20,8 @@ class TaskControllerTest extends WebTestCase
 
     public function setUp(): void
     {
+        $this->initializeTest();
+        self::ensureKernelShutdown();
         $this->client = static::createClient();
         $this->userRepository = static::getContainer()->get(UserRepository::class);
         $this->testAdmin = $this->userRepository->findOneByEmail('admin-test@gmail.com'); // Il s'agit d'un administrateur
@@ -207,6 +209,11 @@ class TaskControllerTest extends WebTestCase
             'task[content]'=> $formDatas[1],
         ]);
         return $this->client->submit($form);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->tearDownTest();
     }
 
 }

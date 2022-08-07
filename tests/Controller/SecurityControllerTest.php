@@ -2,15 +2,14 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\User;
 use App\Repository\UserRepository;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Tests\Fixtures\ToDoFixturesTest;
+
 
 /**
  * @covers \App\Controller\SecurityController
  */
-class SecurityControllerTest extends WebTestCase
+class SecurityControllerTest extends ToDoFixturesTest
 {
     private $user;
     private $client;
@@ -19,6 +18,8 @@ class SecurityControllerTest extends WebTestCase
 
     public function setUp(): void
     {
+        $this->initializeTest();
+        self::ensureKernelShutdown();
         $this->client = static::createClient();
         $userRepository = static::getContainer()->get(UserRepository::class);
         $this->testUser = $userRepository->findOneByEmail('user-test@gmail.com');
@@ -62,5 +63,9 @@ class SecurityControllerTest extends WebTestCase
 
     }
 
+    protected function tearDown(): void
+    {
+        $this->tearDownTest();
+    }
 
 }

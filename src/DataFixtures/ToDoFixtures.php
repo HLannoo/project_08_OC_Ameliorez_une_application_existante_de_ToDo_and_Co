@@ -27,8 +27,8 @@ class ToDoFixtures extends Fixture
                 $user,
                 "password"
             );
-            $user->setEmail($faker->email)
-                ->setUsername($faker->firstName)
+            $user->setEmail($faker->email())
+                ->setUsername($faker->firstName())
                 ->setRoles(["ROLE_USER"])
                 ->setPassword($hashedPassword)
                 ->setIsVerified(1);
