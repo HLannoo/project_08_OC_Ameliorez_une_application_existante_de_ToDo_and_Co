@@ -4,11 +4,15 @@ namespace App\Tests\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Tests\Fixtures\ToDoFixturesTest;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
+use Doctrine\Persistence\ManagerRegistry;
 
-
-class UserControllerTest extends WebTestCase
+/**
+ * @covers \App\Controller\UserController
+ */
+class UserControllerTest extends ToDoFixturesTest
 {
 
     private $client;
@@ -16,14 +20,19 @@ class UserControllerTest extends WebTestCase
     private $testUser;
     private $userRepository;
 
+
     public function setUp(): void
     {
+
+        $this->initializeTest();
+        self::ensureKernelShutdown();
         $this->client = static::createClient();
         $this->userRepository = static::getContainer()->get(UserRepository::class);
         $this->testAdmin = $this->userRepository->findOneByEmail('admin-test@gmail.com'); // Il s'agit d'un administrateur
         $this->testUser = $this->userRepository->findOneByEmail('user-test@gmail.com'); // Il s'agit d'un simple utilisateur
 
     }
+
 
     public function testUserPageRedirectWhenUserIsNotAdmin(): void
     {
@@ -35,6 +44,7 @@ class UserControllerTest extends WebTestCase
         $this->assertSelectorTextContains('h1', 'Connexion');
     }
 
+
     public function testUserPageWhenUserIsAdmin(): void
     {
         $this->client->loginUser($this->testAdmin);
@@ -44,6 +54,7 @@ class UserControllerTest extends WebTestCase
         $this->assertEquals('/user',$this->client->getRequest()->getRequestUri() );
 
     }
+
 
     public function testCreateUserPageRedirectWhenUserIsNotAdmin(): void
     {
@@ -56,30 +67,29 @@ class UserControllerTest extends WebTestCase
     }
 
 
+
     public function testCreateUserWhenUserIsAdmin(): void
     {
-        $this->client->loginUser($this->testAdmin);
-        $crawler = $this->client->request('GET', '/user/create');
-        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-
-        $createButton = $crawler->selectButton("Ajouter");
-        $form = $createButton->form();
-        $form["user[email]"] = "user.test@gmail.com";
-        $form["user[roles]"]->select('ROLE_USER');
-        $form["user[password][first]"] = "password";
-        $form["user[password][second]"] = "password";
-        $form["user[username]"] = "User-Test";
-        $this->client->submit($form);
-
+        $user = $this->testAdmin;
+        $datas = ["user.test@gmail.com","ROLE_USER","password","password","User-Test"];
+        $this->createForm($user,$datas);
+        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
         $this->client->followRedirect();
         $this->assertSelectorTextContains('',"L'utilisateur a bien été ajouté");
         $this->assertInstanceOf(User::class, $this->userRepository->findOneByEmail('user.test@gmail.com'));
     }
 
+
     public function testEditUserPageRedirectWhenUserIsNotAdmin(): void
     {
+
+        $user = $this->testAdmin;
+        $datas = ["user.test+2@gmail.com","ROLE_USER","password","password","User-Test"];
+        $this->createForm($user,$datas);
+        $this->client->request('GET', '/logout');
+
         $this->client->loginUser($this->testUser);
-        $userTest = $this->userRepository->findOneByEmail('user.test@gmail.com');
+        $userTest = $this->userRepository->findOneByEmail('user.test+2@gmail.com');
         $this->client->request('GET', '/user/'.$userTest->getId().'/edit');
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
@@ -87,29 +97,36 @@ class UserControllerTest extends WebTestCase
         $this->assertSelectorTextContains('h1', 'Connexion');
     }
 
+
     public function testEditUserWhenUserIsAdmin(): void
     {
-        $this->client->loginUser($this->testAdmin);
-        $userTest = $this->userRepository->findOneByEmail('user.test@gmail.com');
-        $crawler = $this->client->request('GET', '/user/'.$userTest->getId().'/edit');
+        $user = $this->testAdmin;
+        $datas = ["user.test+3@gmail.com","ROLE_USER","password","password","User-Test"];
+        $this->createForm($user,$datas);
+
+        $userTest = $this->userRepository->findOneByEmail('user.test+3@gmail.com');
+        $data = ["user.test+4@gmail.com","ROLE_USER","User-Test"];
+        $this->EditForm($data,$user,$userTest);
+        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
+        $this->client->followRedirect();
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        $form = $crawler->selectButton('Modifier')->form([
-            'user[email]' => 'user.test.modify@gmail.com',
-            'user[roles]'=> ('ROLE_ADMIN'),
-            'user[username]' => 'userTestModify'
-        ]);
-        $this->client->submit($form);
 
-        $this->client->followRedirect();
+
         $this->assertSelectorTextContains('',"L'utilisateur a bien été modifié");
-        $this->assertTrue( "user.test.modify@gmail.com" === $this->userRepository->find($userTest->getId())->getEmail());
+        $this->assertInstanceOf(User::class, $this->userRepository->findOneByEmail('user.test+4@gmail.com'));
     }
+
 
     public function testDeleteUserRedirectWhenUserIsNotAdmin(): void
     {
+        $user = $this->testAdmin;
+        $data = ["user.test+5@gmail.com","ROLE_USER","password","password","User-Test"];
+        $this->createForm($user,$data);
+        $this->client->request('GET', '/logout');
+
         $this->client->loginUser($this->testUser);
-        $userTest = $this->userRepository->findOneByEmail('user.test.modify@gmail.com');
+        $userTest = $this->userRepository->findOneByEmail('user.test+5@gmail.com');
         $this->client->request('GET', '/user/'.$userTest->getId().'/delete');
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
@@ -117,16 +134,53 @@ class UserControllerTest extends WebTestCase
         $this->assertSelectorTextContains('h1', 'Connexion');
     }
 
+
     public function testDeleteUserWhenUserIsAdmin(): void
     {
-        $this->client->loginUser($this->testAdmin);
-        $userTest = $this->userRepository->findOneByEmail('user.test.modify@gmail.com');
+        $user = $this->testAdmin;
+        $datas = ["user.test+6@gmail.com","ROLE_USER","password","password","User-Test"];
+        $this->createForm($user,$datas);
+
+        $userTest = $this->userRepository->findOneByEmail('user.test+6@gmail.com');
         $this->client->request('GET', '/user/'.$userTest->getId().'/delete');
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
         $this->client->followRedirect();
         $this->assertSelectorTextContains('',"Le user {$userTest->getUsername()} a été supprimé avec succès !");
         $this->assertNull($this->userRepository->findOneByEmail($userTest));
+    }
+
+    private function createForm($user, $datas)
+    {
+        $this->client->loginUser($user);
+        $crawler = $this->client->request('GET', '/user/create');
+        $createButton = $crawler->selectButton("Ajouter");
+        $form = $createButton->form();
+        $form["user[email]"] = $datas[0];
+        $form["user[roles]"]->select($datas[1]);
+        $form["user[password][first]"] = $datas[2];
+        $form["user[password][second]"] = $datas[3];
+        $form["user[username]"] = $datas[4];
+
+        return $this->client->submit($form);
+
+    }
+
+    private function EditForm($data, $user, $userTest)
+    {
+        $this->client->loginUser($user);
+        $crawler = $this->client->request('GET', '/user/'.$userTest->getId().'/edit');
+        $form = $crawler->selectButton("Modifier")->form([
+            'user[email]' => $data[0],
+            'user[roles]'=> $data[1],
+            'user[username]'=> $data[2],
+        ]);
+        return $this->client->submit($form);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->tearDownTest();
     }
 
 

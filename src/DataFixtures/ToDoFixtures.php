@@ -27,8 +27,8 @@ class ToDoFixtures extends Fixture
                 $user,
                 "password"
             );
-            $user->setEmail($faker->email)
-                ->setUsername($faker->firstName)
+            $user->setEmail($faker->email())
+                ->setUsername($faker->firstName())
                 ->setRoles(["ROLE_USER"])
                 ->setPassword($hashedPassword)
                 ->setIsVerified(1);
@@ -81,18 +81,6 @@ class ToDoFixtures extends Fixture
             $manager->persist($userTest);
 
         }
-        for ($k = 0; $k < 10; $k ++)
-        {
-            $anonymeTestTask = new Task;
-            $anonymeTestTask->setTitle("TestTaskAnonymous$k")
-                ->setContent($faker->paragraph(1))
-                ->setCurrentUser($anonymeTest)
-                ->setCreatedAt(new \DateTimeImmutable())
-                ->setIsDone(false);
-
-            $manager->persist($anonymeTestTask);
-        }
-
 
         for ($a = 0; $a < 5; $a++) {
             $anonymeTask = new Task;

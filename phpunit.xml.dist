@@ -21,12 +21,20 @@
         <testsuite name="Project Test Suite">
             <directory>tests</directory>
         </testsuite>
+
     </testsuites>
 
     <coverage processUncoveredFiles="true">
         <include>
-            <directory suffix=".php">src</directory>
+            <directory suffix=".php">src\Controller</directory>
+            <directory suffix=".php">src\Entity</directory>
+            <directory suffix=".php">src\Form</directory>
+            <directory suffix=".php">src\Security</directory>
+            <directory suffix=".php">src\Services</directory>
         </include>
+        <exclude>
+            <file>src\Controller\ResetPasswordController.php</file>
+        </exclude>
     </coverage>
 
     <listeners>
