@@ -15,23 +15,30 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class UserController extends AbstractController
 {
-    public function __construct(protected UserRepository $userRepository, protected EntityManagerInterface $em, protected UserPasswordHasherInterface $passwordHasher, protected  EmailVerifier $emailVerifier)
+    public function __construct(protected UserRepository $userRepository, protected EntityManagerInterface $em, protected UserPasswordHasherInterface $passwordHasher, protected  EmailVerifier $emailVerifier, protected CacheInterface $cache)
     {
         $this->userRepository = $userRepository;
         $this->em = $em;
         $this->passwordHasher = $passwordHasher;
         $this->emailVerifier = $emailVerifier;
+        $this->cache = $cache;
     }
 
     #[Route('/user', name: 'user_list')]
     #[Security("is_granted('CAN_VIEW', user)")]
     public function index(): Response
     {
-        return $this->render('user/index.html.twig', [
-            'users' => $this->userRepository->findAll()]);
+        $users = $this->cache->get('user_list', function(){
+            return $this->userRepository->findAll();
+        });
+        return $this->render('user/index.html.twig',
+            [
+            'users' => $users
+            ]);
     }
 
     #[Route('/user/create', name: 'user_create')]
@@ -56,6 +63,7 @@ class UserController extends AbstractController
             $this->em->flush();
 
             $this->addFlash('success', "L'utilisateur a bien été ajouté");
+            $this->cache->delete('user_list');
             return $this->redirectToRoute('user_list');
         }
         return $this->render('user/create_update.html.twig',
@@ -76,7 +84,7 @@ class UserController extends AbstractController
 
                 $this->em->flush();
                 $this->addFlash('success', "L'utilisateur a bien été modifié");
-
+                $this->cache->delete('user_list');
                 return $this->redirectToRoute('user_list');
 
             }
@@ -102,7 +110,8 @@ class UserController extends AbstractController
             'success',
             "Le user {$users->getUsername()} a été supprimé avec succès !"
         );
-
+        $this->cache->delete('user_list');
+        $this->cache->delete('task_list');
         return $this->redirectToRoute('user_list');
 
     }

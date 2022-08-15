@@ -30,7 +30,8 @@
         "symfony/yaml": "6.0.*",
         "symfonycasts/reset-password-bundle": "^1.14",
         "symfonycasts/verify-email-bundle": "^1.10",
-        "twig/extra-bundle": "^2.12|^3.0",
+        "twig/cache-extra": "^3.4",
+        "twig/extra-bundle": "^3.4",
         "twig/twig": "^2.12|^3.0"
     },
     "config": {

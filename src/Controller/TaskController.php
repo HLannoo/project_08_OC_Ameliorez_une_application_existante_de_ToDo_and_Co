@@ -12,48 +12,47 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class TaskController extends AbstractController
 {
-    public function __construct(protected TaskRepository $taskRepository, protected EntityManagerInterface $em, protected UserRepository $userRepository)
+    public function __construct(protected TaskRepository $taskRepository, protected EntityManagerInterface $em, protected UserRepository $userRepository, CacheInterface $cache)
     {
         $this->taskRepository = $taskRepository;
         $this->em = $em;
         $this->userRepository = $userRepository;
+        $this->cache = $cache;
     }
 
     #[Route('/task', name: 'task_list')]
     public function index(): Response
     {
+        $tasks = $this->cache->get('task_list', function(){
+            return $this->taskRepository->findBy(array(), array('isDone' => 'ASC','createdAt'=>'DESC'));
+        });
+
         return $this->render('task/index.html.twig', [
-            'tasks' => $this->taskRepository->findBy(array(), array('isDone' => 'ASC','createdAt'=>'DESC'))
+            'tasks' => $tasks
         ]);
     }
 
 
     #[Route('/task/create', name: 'task_create')]
-    public function testUserForm(Request $request)
+    public function createTaskForm(Request $request)
     {
         $task = new Task();
         $form = $this->createForm(TaskType::class,$task);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $task->setCreatedAt(new \DateTimeImmutable())
-                ->setIsDone(false);
-            if($this->getUser()->getRoles()[0] == "ROLE_USER" || $this->getUser()->getRoles()[0] == "ROLE_ADMIN") {
-                $task->setCurrentUser($this->getUser());
-            }
-            elseif($this->getuser()->getRoles()[0] == "ROLE_ANONYMOUS")
-            {
-                $anonymous = $this->userRepository->findOneBy([
-                    'username' => 'Anonyme'
-                ]);
-                $task->setCurrentUser($anonymous);
-            }
+                ->setIsDone(false)
+                ->setCurrentUser($this->getUser());
+
             $this->em->persist($task);
             $this->em->flush();
 
             $this->addFlash('success', 'La tâche a été bien été ajoutée à la liste.');
+            $this->cache->delete('task_list');
             return $this->redirectToRoute('task_list');
         }
         return $this->render('task/create_update.html.twig', [
@@ -78,6 +77,7 @@ class TaskController extends AbstractController
                 'success',
                 "La tâche a été mise à jour !"
             );
+            $this->cache->delete('task_list');
             return $this->redirectToRoute('task_list');
         }
 
@@ -101,7 +101,7 @@ class TaskController extends AbstractController
             'success',
             "La tâche {$tasks->getTitle()} a été supprimé avec succès !"
         );
-
+        $this->cache->delete('task_list');
         return $this->redirectToRoute('task_list');
     }
 
@@ -120,7 +120,7 @@ class TaskController extends AbstractController
         $this->em->flush();
 
         $this->addFlash('success',"Tâche mise à jour");
-
+        $this->cache->delete('task_list');
         return $this->redirectToRoute('task_list');
     }
 
