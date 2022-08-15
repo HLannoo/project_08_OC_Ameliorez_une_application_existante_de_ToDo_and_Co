@@ -13,10 +13,6 @@ class TaskVoter extends Voter
     public const DELETE = 'TASK_DELETE';
     public const TOGGLE = 'TASK_TOGGLE';
 
-    function __construct(protected TaskRepository $taskRepository)
-    {
-        $this->taskRepository = $taskRepository;
-    }
     protected function supports(string $attribute, $subject): bool
     {
         // replace with your own logic
