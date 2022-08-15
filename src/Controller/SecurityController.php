@@ -5,11 +5,11 @@ namespace App\Controller;
 use App\Form\LoginType;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class SecurityController extends AbstractController
 {
@@ -19,7 +19,7 @@ class SecurityController extends AbstractController
     }
 
     #[Route('/login', name: 'security_login')]
-    public function login(AuthenticationUtils $utils, Request $request): Response
+    public function login(AuthenticationUtils $utils): Response
     {
         $form = $this->createForm(LoginType::class);
         $errorMessage = "";

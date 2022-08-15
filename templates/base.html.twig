@@ -3,12 +3,16 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>{% block title %}Welcome!
+            {% endblock %}</title>
+
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
         <link rel="stylesheet" href="https://bootswatch.com/5/lux/bootstrap.min.css">
         <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+
     </head>
     <header>
+
         {% block header %}
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm ">
                 <div class="container"><a href="" class="navbar-brand"> <b>ToDo&Co</b></a>
@@ -35,14 +39,6 @@
                 </div>
             </nav>
         {% endblock %}
-        {% if app.user and app.user.isVerified == false %}
-            <div class="alert alert-warning alert-dismissible" role="alert">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                <div class="alert-message">
-                    <strong>Vous êtes connecté en Anonyme car votre compte n'est pas activé, vérifiez votre boite e-mail ! </strong>
-                </div>
-            </div>
-        {% endif %}
     </header>
     <body>
     {% block alert %}
