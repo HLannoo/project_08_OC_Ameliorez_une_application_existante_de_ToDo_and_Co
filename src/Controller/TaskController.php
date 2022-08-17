@@ -92,7 +92,6 @@ class TaskController extends AbstractController
     public function deleteTask($id, Task $task): response
     {
 
-
         $tasks = $this->taskRepository->findOneBy(['id' => $id]);
         $this->em->remove($tasks);
         $this->em->flush();
