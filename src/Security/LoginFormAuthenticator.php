@@ -25,7 +25,6 @@ class LoginFormAuthenticator extends AbstractAuthenticator
     public function __construct(private UrlGeneratorInterface $urlGenerator, protected UserRepository $userRepository)
     {
         $this->urlGenerator = $urlGenerator;
-        $this->userRepository = $userRepository;
     }
 
     public function supports(Request $request): ?bool
