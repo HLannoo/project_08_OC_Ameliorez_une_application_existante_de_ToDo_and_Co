@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Erreur 404 {% endblock %}
+
+{% block body %}
+    <div class="text-center"></div>
+    <div class="text-center">
+        <div class="text-center">
+            <h1>Erreur 404 !</h1>
+        </div>
+        <h2>Nous sommes désolé mais la page n'existe pas</h2>
+        <a href="{{ path('security_login')}}" class="btn btn-primary rounded">Retourner à la page de connexion</a>
+    </div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Erreur 500 {% endblock %}
+
+{% block body %}
+    <div class="text-center"></div>
+    <div class="text-center">
+        <div class="text-center">
+            <h1>Erreur 500 !</h1>
+        </div>
+        <h2>Désolé, notre serveur a rencontré un problème ! </h2>
+        <a href="{{ path('security_login')}}" class="btn btn-primary rounded">Retourner à la page de connexion</a>
+    </div>
+{% endblock %}
