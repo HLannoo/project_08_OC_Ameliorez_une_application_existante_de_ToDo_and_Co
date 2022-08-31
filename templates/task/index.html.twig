@@ -24,7 +24,7 @@
                                     {% endif %}
                                     <b>ToDo :{{ task.title }}</b></a>
                             </h4>
-                            <p class="pull-right"> Appartient à : {{ task.currentUser.username }}</p>
+                            <p class="pull-right"> Appartient à : {{ task.currentuser.username }}</p>
                             <p><b>Description: </b>{{ task.content }}</p>
                             <p class="pull-right"> Mise à jour le : {{ task.createdAt | date('d/m/Y',"Europe/Paris") }}
                                 à {{ task.createdAt | date('H:i:s',"Europe/Paris") }}</p>
